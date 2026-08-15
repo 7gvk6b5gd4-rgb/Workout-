@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#111111">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="app-icon.png">
 <title>Todd's 12-Week Workout Tracker</title>
 <style>
 :root{--bg:#f5f5f7;--card:#fff;--text:#111;--muted:#737377;--line:#e5e5e8;--soft:#ececef}
@@ -19,7 +20,7 @@ button{font-weight:800}.dark{background:#111;color:#fff;border-color:#111}
 .routine h3{margin:0 0 6px;font-size:18px}.small{font-size:12px;color:var(--muted);line-height:1.4}
 .workoutHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:22px 0 10px}
 .workoutHead h2{margin:0;font-size:22px}.pill{background:#111;color:#fff;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800}
-.exercise{padding:14px;margin-bottom:10px}.exTop{display:flex;justify-content:space-between;gap:10px}.exName{font-size:18px;font-weight:850}.meta{font-size:13px;color:var(--muted);margin-top:5px}
+.exercise{padding:14px;margin-bottom:10px}.exWrap{display:grid;grid-template-columns:112px 1fr;gap:12px;align-items:start}.thumb{width:112px;height:78px;object-fit:cover;border-radius:14px;background:#111;border:1px solid var(--line)}.exTop{display:flex;justify-content:space-between;gap:10px}.exName{font-size:18px;font-weight:850}.meta{font-size:13px;color:var(--muted);margin-top:5px}
 .sets{display:grid;gap:8px;margin-top:12px}.setrow{display:grid;grid-template-columns:42px 1fr 1fr 50px;gap:8px;align-items:center}
 .lbl{font-size:11px;font-weight:800;color:var(--muted)}.entry{min-width:0;border:1px solid var(--line);border-radius:12px;background:#fafafa;padding:10px}
 .done{appearance:none;width:44px;height:44px;border:2px solid #c9c9ce;border-radius:12px;background:#fff}
@@ -31,7 +32,7 @@ button{font-weight:800}.dark{background:#111;color:#fff;border-color:#111}
 .clock{font-size:29px;font-weight:900;font-variant-numeric:tabular-nums}.timerText{flex:1}.timerText b{display:block}.timerText span{font-size:11px;color:#cfcfd4}.timer button{width:auto;padding:10px 12px;border:none}.timer .secondary{background:#2d2d30;color:#fff}
 .notice{background:#fff8df;border:1px solid #ead895;border-radius:15px;padding:11px 12px;font-size:13px;margin-bottom:14px}
 .hidden{display:none}
-@media(max-width:520px){.grid{grid-template-columns:1fr}.setrow{grid-template-columns:36px 1fr 1fr 48px}}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.exWrap{grid-template-columns:96px 1fr}.thumb{width:96px;height:70px}.setrow{grid-template-columns:36px 1fr 1fr 48px}}
 </style>
 </head>
 <body>
@@ -139,6 +140,18 @@ function renderCards(){
    $("routineCards").appendChild(d)
  })
 }
+
+function iconFor(name){
+ const n=name.toLowerCase();
+ if(n.includes("stair")) return "icon-stairs.svg";
+ if(n.includes("leg raise")||n.includes("crunch")||n.includes("plank")) return "icon-abs.svg";
+ if(n.includes("leg ")||n.includes("lung")||n.includes("calf")||n.includes("hamstring")) return "icon-legs.svg";
+ if(n.includes("bicep")||n.includes("tricep")||n.includes("curl")) return "icon-arms.svg";
+ if(n.includes("row")||n.includes("pull")||n.includes("lat")) return "icon-back.svg";
+ if(n.includes("shoulder")) return "icon-shoulder.svg";
+ return "icon-chest.svg";
+}
+
 function renderTracker(){
  const r=routines.find(x=>x.id===active); $("title").textContent=r.name;$("weekPill").textContent="Week "+$("week").value;
  $("exercises").innerHTML="";
@@ -154,7 +167,7 @@ function renderTracker(){
     if(prevReps.length===it.sets && prevReps.every(v=>v>=10)) overload=" • Consider increasing weight";
   }
   let meta=it.sets?`${it.sets} sets • ${it.reps} reps • 90 sec rest${it.rir===0?" • RIR 0":""}${overload}`:`${it.time}${it.circuit?" • 3 rounds":""}`;
-  ex.innerHTML=`${it.circuit?'<div class="circuitTag">ABS CIRCUIT</div>':""}<div class="exTop"><div><div class="exName">${it.n}${it.suggested?' <span style="font-size:10px;background:#ececef;padding:4px 7px;border-radius:999px;vertical-align:2px">SUGGESTED</span>':""}</div><div class="meta">${meta}</div>${it.note?`<div class="small" style="margin-top:6px">${it.note}</div>`:""}</div></div><div class="sets"></div>`;
+  ex.innerHTML=`${it.circuit?'<div class="circuitTag">ABS CIRCUIT</div>':""}<div class="exWrap"><img class="thumb" src="${iconFor(it.n)}" alt="${it.n} exercise icon"><div><div class="exTop"><div><div class="exName">${it.n}${it.suggested?' <span style="font-size:10px;background:#ececef;padding:4px 7px;border-radius:999px;vertical-align:2px">SUGGESTED</span>':""}</div><div class="meta">${meta}</div>${it.note?`<div class="small" style="margin-top:6px">${it.note}</div>`:""}</div></div></div></div><div class="sets"></div>`;
   let box=ex.querySelector(".sets");
   if(it.sets && Number($("week").value)>1){
     let prev=[];
