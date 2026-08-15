@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Todd's 12-Week Workout Tracker</title>
+<style>
+:root{--bg:#f5f5f7;--card:#fff;--text:#111;--muted:#737377;--line:#e5e5e8;--soft:#ececef}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+main{max-width:780px;margin:auto;padding:18px 14px 120px}
+h1{font-size:25px;margin:2px 0 6px}.lead{margin:0 0 16px;color:var(--muted)}
+.panel,.routine,.exercise{background:var(--card);border:1px solid var(--line);border-radius:20px}
+.panel{padding:14px;margin-bottom:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+select,button,input{font:inherit}.control,button{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px;width:100%}
+button{font-weight:800}.dark{background:#111;color:#fff;border-color:#111}
+.routines{display:grid;gap:10px}.routine{padding:14px;cursor:pointer}.routine.active{outline:3px solid #111}
+.routine h3{margin:0 0 6px;font-size:18px}.small{font-size:12px;color:var(--muted);line-height:1.4}
+.workoutHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:22px 0 10px}
+.workoutHead h2{margin:0;font-size:22px}.pill{background:#111;color:#fff;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.exercise{padding:14px;margin-bottom:10px}.exTop{display:flex;justify-content:space-between;gap:10px}.exName{font-size:18px;font-weight:850}.meta{font-size:13px;color:var(--muted);margin-top:5px}
+.sets{display:grid;gap:8px;margin-top:12px}.setrow{display:grid;grid-template-columns:42px 1fr 1fr 50px;gap:8px;align-items:center}
+.lbl{font-size:11px;font-weight:800;color:var(--muted)}.entry{min-width:0;border:1px solid var(--line);border-radius:12px;background:#fafafa;padding:10px}
+.done{appearance:none;width:44px;height:44px;border:2px solid #c9c9ce;border-radius:12px;background:#fff}
+.done:checked{background:#111;border-color:#111}.done:checked:after{content:"✓";display:grid;place-items:center;height:100%;color:#fff;font-size:22px;font-weight:900}
+.progress{height:9px;background:#dddde2;border-radius:99px;overflow:hidden}.progress div{height:100%;background:#111}
+.stats{display:flex;justify-content:space-between;align-items:center;margin-top:9px;font-size:13px;color:var(--muted)}
+.circuit{border:2px solid #111}.circuitTag{display:inline-block;background:#111;color:#fff;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;margin-bottom:8px}
+.timer{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:12px;width:min(752px,calc(100% - 24px));background:#111;color:#fff;border-radius:22px;padding:12px;display:flex;gap:12px;align-items:center;box-shadow:0 12px 30px #0004}
+.clock{font-size:29px;font-weight:900;font-variant-numeric:tabular-nums}.timerText{flex:1}.timerText b{display:block}.timerText span{font-size:11px;color:#cfcfd4}.timer button{width:auto;padding:10px 12px;border:none}.timer .secondary{background:#2d2d30;color:#fff}
+.notice{background:#fff8df;border:1px solid #ead895;border-radius:15px;padding:11px 12px;font-size:13px;margin-bottom:14px}
+.hidden{display:none}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.setrow{grid-template-columns:36px 1fr 1fr 48px}}
+</style>
+</head>
+<body>
+<main>
+<h1>Todd's 12-Week Workout Tracker</h1>
+<p class="lead">Your routines are shown below. Pick a week and a workout, then log every set.</p>
+
+<div class="notice"><b>Tracker ready:</b> Your screenshot exercises are included. The first three Back + Biceps movements are clearly marked as suggested additions.</div>
+
+<div class="panel">
+  <div class="grid">
+    <select id="week" class="control"></select>
+    <button id="overviewBtn">Show all workouts</button>
+  </div>
+</div>
+
+<div id="overview">
+  <div class="routines" id="routineCards"></div>
+</div>
+
+<section id="tracker">
+  <div class="workoutHead"><h2 id="title"></h2><span class="pill" id="weekPill"></span></div>
+  <div class="progress"><div id="bar" style="width:0%"></div></div>
+  <div class="stats"><span id="progressText">0 / 0 complete</span><span id="percent">0%</span></div>
+  <div id="exercises" style="margin-top:12px"></div>
+  <button class="dark" id="finish">Finish & save workout</button>
+</section>
+</main>
+
+<div class="timer">
+  <div class="clock" id="clock">01:30</div>
+  <div class="timerText"><b>90-second rest</b><span id="timerNote">Auto-starts when you complete a strength set.</span></div>
+  <button id="toggle">Start</button>
+  <button class="secondary" id="reset">↺</button>
+</div>
+
+<script>
+const REST=90;
+const routines=[
+ {id:"push",name:"Chest + Shoulders + Triceps",summary:"8 exercises • 3×8–10 strength work + 15 min stairs",items:[
+  {n:"Machine Chest Flys",sets:3,reps:"8–10"},
+  {n:"Cable Single Arm Lat Raises",sets:3,reps:"8–10",rir:0},
+  {n:"Incline DB Chest Press",sets:3,reps:"8–10"},
+  {n:"DB Shoulder Press",sets:3,reps:"8–10"},
+  {n:"Smith Machine Incline Chest Press",sets:3,reps:"8–10"},
+  {n:"Cable Tricep Pushdowns",sets:3,reps:"8–10"},
+  {n:"Cable Single Arm Tricep Extensions",sets:3,reps:"8–10",rir:0},
+  {n:"Stairs",time:"15 min"}
+ ]},
+ {id:"legs",name:"Legs + Abs",summary:"Leg extensions, curls, press, calves, lunges + 3-round abs circuit",items:[
+  {n:"Leg Extensions",sets:3,reps:"8–10",rir:0},
+  {n:"Lying Hamstring Curls",sets:3,reps:"8–10",rir:0},
+  {n:"Leg Press",sets:3,reps:"8–10",rir:0},
+  {n:"Seated Calf Raises",sets:3,reps:"8–10",rir:0},
+  {n:"DB Walking Lunges (Glute Biased)",sets:3,reps:"8–10"},
+  {n:"Hanging Leg Raises",time:"30 sec",circuit:true},
+  {n:"Crunches",time:"45 sec",circuit:true},
+  {n:"Lower Leg Raises",time:"30 sec",circuit:true},
+  {n:"Plank",time:"30 sec",circuit:true}
+ ]},
+ {id:"backcomplete",name:"Back + Biceps",summary:"3 suggested back movements + your Rack Pulls, curls and 15 min stairs",items:[
+  {n:"Lat Pulldown",sets:3,reps:"8–10",suggested:true},
+  {n:"Seated Cable Row",sets:3,reps:"8–10",suggested:true},
+  {n:"Single-Arm Lat Pulldown / Row",sets:3,reps:"8–10",suggested:true},
+  {n:"Rack Pulls",sets:3,reps:"8–10"},
+  {n:"DB Biceps Curls",sets:3,reps:"8–10",note:"Push until failure on each set."},
+  {n:"DB Hammer Curls",sets:3,reps:"8–10",note:"Push until failure on each set."},
+  {n:"Stairs",time:"15 min"}
+ ]},
+ {id:"stairsabs",name:"Stairs + Abs",summary:"20 min stairs + 3 rounds of the men's gym abs circuit",items:[
+  {n:"Stairs",time:"20 min"},
+  {n:"Hanging Leg Raises",time:"30 sec",circuit:true},
+  {n:"Crunches",time:"45 sec",circuit:true},
+  {n:"Lower Leg Raises",time:"30 sec",circuit:true},
+  {n:"Plank",time:"30 sec",circuit:true}
+ ]},
+ {id:"uppermix",name:"Upper Body + Arms + Abs",summary:"Back, chest, shoulders, biceps, triceps + 3-round abs circuit",items:[
+  {n:"Cable Bar Lateral Pulldown",sets:3,reps:"8–10"},
+  {n:"Cable Seated Rows",sets:3,reps:"8–10",rir:0},
+  {n:"Machine Chest Flys",sets:3,reps:"8–10"},
+  {n:"Incline DB Chest Press",sets:3,reps:"8–10"},
+  {n:"Cable Single Arm Lat Raises",sets:3,reps:"8–10",rir:0},
+  {n:"Cable Bicep Curls",sets:3,reps:"8–10",rir:0},
+  {n:"Overhead Cable Tricep Extensions",sets:3,reps:"8–10"},
+  {n:"Hanging Leg Raises",time:"30 sec",circuit:true},
+  {n:"Crunches",time:"45 sec",circuit:true},
+  {n:"Lower Leg Raises",time:"30 sec",circuit:true},
+  {n:"Plank",time:"30 sec",circuit:true}
+ ]}
+];
+const $=x=>document.getElementById(x);
+const state=JSON.parse(localStorage.getItem("todd-workouts-v2")||"{}");
+for(let i=1;i<=12;i++){let o=document.createElement("option");o.value=i;o.textContent="Week "+i;$("week").appendChild(o)}
+$("week").value=state.lastWeek||1;
+let active=state.lastRoutine||routines[0].id;
+function save(){state.lastWeek=$("week").value;state.lastRoutine=active;localStorage.setItem("todd-workouts-v2",JSON.stringify(state))}
+function dataKey(ri,ii,si,f){return `w${$("week").value}|${ri}|${ii}|${si}|${f}`}
+function get(k,d=""){return state[k]??d} function set(k,v){state[k]=v;save()}
+function renderCards(){
+ $("routineCards").innerHTML="";
+ routines.forEach(r=>{
+   let d=document.createElement("div");d.className="routine"+(r.id===active?" active":"");
+   d.innerHTML=`<h3>${r.name}</h3><div class="small">${r.summary}</div>`;
+   d.onclick=()=>{active=r.id;save();renderCards();renderTracker();document.getElementById("tracker").scrollIntoView({behavior:"smooth"})};
+   $("routineCards").appendChild(d)
+ })
+}
+function renderTracker(){
+ const r=routines.find(x=>x.id===active); $("title").textContent=r.name;$("weekPill").textContent="Week "+$("week").value;
+ $("exercises").innerHTML="";
+ r.items.forEach((it,ii)=>{
+  let ex=document.createElement("div");ex.className="exercise"+(it.circuit?" circuit":"");
+  let overload="";
+  if(it.sets && Number($("week").value)>1){
+    let prevReps=[];
+    for(let ps=1;ps<=it.sets;ps++){
+      let rk=`w${Number($("week").value)-1}|${r.id}|${ii}|${ps}|reps`;
+      if(state[rk]!==undefined && state[rk]!=="") prevReps.push(Number(state[rk]));
+    }
+    if(prevReps.length===it.sets && prevReps.every(v=>v>=10)) overload=" • Consider increasing weight";
+  }
+  let meta=it.sets?`${it.sets} sets • ${it.reps} reps • 90 sec rest${it.rir===0?" • RIR 0":""}${overload}`:`${it.time}${it.circuit?" • 3 rounds":""}`;
+  ex.innerHTML=`${it.circuit?'<div class="circuitTag">ABS CIRCUIT</div>':""}<div class="exTop"><div><div class="exName">${it.n}${it.suggested?' <span style="font-size:10px;background:#ececef;padding:4px 7px;border-radius:999px;vertical-align:2px">SUGGESTED</span>':""}</div><div class="meta">${meta}</div>${it.note?`<div class="small" style="margin-top:6px">${it.note}</div>`:""}</div></div><div class="sets"></div>`;
+  let box=ex.querySelector(".sets");
+  if(it.sets && Number($("week").value)>1){
+    let prev=[];
+    for(let ps=1;ps<=it.sets;ps++){
+      let pk=`w${Number($("week").value)-1}|${r.id}|${ii}|${ps}|w`;
+      if(state[pk]) prev.push(state[pk]);
+    }
+    if(prev.length){
+      let hint=document.createElement("div");hint.className="small";hint.style.marginTop="8px";
+      hint.textContent="Previous week weights: "+prev.join(" / ");
+      ex.querySelector(".exTop").after(hint);
+    }
+  }
+  if(it.sets){
+   for(let s=1;s<=it.sets;s++){
+    let row=document.createElement("div");row.className="setrow";
+    row.innerHTML=`<div class="lbl">SET ${s}</div><input class="entry w" inputmode="decimal" placeholder="Weight" value="${get(dataKey(r.id,ii,s,"w"))}"><input class="entry reps" inputmode="numeric" placeholder="Reps" value="${get(dataKey(r.id,ii,s,"reps"))}"><input class="done" type="checkbox" ${get(dataKey(r.id,ii,s,"done"),false)?"checked":""}>`;
+    row.querySelector(".w").onchange=e=>set(dataKey(r.id,ii,s,"w"),e.target.value);
+    row.querySelector(".reps").onchange=e=>set(dataKey(r.id,ii,s,"reps"),e.target.value);
+    row.querySelector(".done").onchange=e=>{set(dataKey(r.id,ii,s,"done"),e.target.checked);if(e.target.checked)start(true);progress()};
+    box.appendChild(row)
+   }
+  }else{
+   let row=document.createElement("div");row.className="setrow";row.style.gridTemplateColumns="1fr 50px";
+   row.innerHTML=`<div class="small">Mark complete when finished</div><input class="done" type="checkbox" ${get(dataKey(r.id,ii,1,"done"),false)?"checked":""}>`;
+   row.querySelector(".done").onchange=e=>{set(dataKey(r.id,ii,1,"done"),e.target.checked);progress()};box.appendChild(row)
+  }
+  $("exercises").appendChild(ex)
+ });
+ progress()
+}
+function progress(){let a=[...document.querySelectorAll("#exercises .done")],d=a.filter(x=>x.checked).length,p=a.length?Math.round(d/a.length*100):0;$("bar").style.width=p+"%";$("progressText").textContent=`${d} / ${a.length} complete`;$("percent").textContent=p+"%"}
+$("week").onchange=()=>{save();renderTracker()};
+$("overviewBtn").onclick=()=>document.getElementById("overview").scrollIntoView({behavior:"smooth"});
+$("finish").onclick=()=>{set(`w${$("week").value}|${active}|finished`,new Date().toISOString());alert("Workout saved on this device.")};
+
+let remaining=REST,handle=null,running=false;
+function timerUI(){let m=Math.floor(remaining/60),s=remaining%60;$("clock").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");$("toggle").textContent=running?"Pause":(remaining===REST?"Start":"Resume")}
+function start(reset=false){if(reset)remaining=REST;if(handle)clearInterval(handle);running=true;$("timerNote").textContent="Recover, then start your next set.";handle=setInterval(()=>{if(remaining>0){remaining--;timerUI()}else{clearInterval(handle);handle=null;running=false;$("timerNote").textContent="Rest complete — next set.";timerUI();if(navigator.vibrate)navigator.vibrate([180,80,180])}},1000);timerUI()}
+$("toggle").onclick=()=>{if(running){clearInterval(handle);handle=null;running=false;timerUI()}else start(false)};
+$("reset").onclick=()=>{if(handle)clearInterval(handle);handle=null;running=false;remaining=REST;$("timerNote").textContent="Auto-starts when you complete a strength set.";timerUI()};
+renderCards();renderTracker();timerUI();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+</script>
+</body></html>
