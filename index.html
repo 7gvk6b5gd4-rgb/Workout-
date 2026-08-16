@@ -4,48 +4,91 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#111111">
-<link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="app-icon.png">
 <title>Todd's 12-Week Workout Tracker</title>
 <style>
-:root{--bg:#f5f5f7;--card:#fff;--text:#111;--muted:#737377;--line:#e5e5e8;--soft:#ececef}
-*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-main{max-width:780px;margin:auto;padding:18px 14px 120px}
-h1{font-size:25px;margin:2px 0 6px}.lead{margin:0 0 16px;color:var(--muted)}
-.panel,.routine,.exercise{background:var(--card);border:1px solid var(--line);border-radius:20px}
-.panel{padding:14px;margin-bottom:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-select,button,input{font:inherit}.control,button{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px;width:100%}
-button{font-weight:800}.dark{background:#111;color:#fff;border-color:#111}
-.routines{display:grid;gap:10px}.routine{padding:14px;cursor:pointer}.routine.active{outline:3px solid #111}
-.routine h3{margin:0 0 6px;font-size:18px}.small{font-size:12px;color:var(--muted);line-height:1.4}
-.workoutHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:22px 0 10px}
-.workoutHead h2{margin:0;font-size:22px}.pill{background:#111;color:#fff;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800}
-.exercise{padding:14px;margin-bottom:10px}.exWrap{display:grid;grid-template-columns:112px 1fr;gap:12px;align-items:start}.thumb{width:112px;height:78px;object-fit:cover;border-radius:14px;background:#111;border:1px solid var(--line)}.exTop{display:flex;justify-content:space-between;gap:10px}.exName{font-size:18px;font-weight:850}.meta{font-size:13px;color:var(--muted);margin-top:5px}
-.sets{display:grid;gap:8px;margin-top:12px}.setrow{display:grid;grid-template-columns:42px 1fr 1fr 50px;gap:8px;align-items:center}
-.lbl{font-size:11px;font-weight:800;color:var(--muted)}.entry{min-width:0;border:1px solid var(--line);border-radius:12px;background:#fafafa;padding:10px}
-.done{appearance:none;width:44px;height:44px;border:2px solid #c9c9ce;border-radius:12px;background:#fff}
-.done:checked{background:#111;border-color:#111}.done:checked:after{content:"✓";display:grid;place-items:center;height:100%;color:#fff;font-size:22px;font-weight:900}
-.progress{height:9px;background:#dddde2;border-radius:99px;overflow:hidden}.progress div{height:100%;background:#111}
-.stats{display:flex;justify-content:space-between;align-items:center;margin-top:9px;font-size:13px;color:var(--muted)}
-.circuit{border:2px solid #111}.circuitTag{display:inline-block;background:#111;color:#fff;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;margin-bottom:8px}
-.timer{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:12px;width:min(752px,calc(100% - 24px));background:#111;color:#fff;border-radius:22px;padding:12px;display:flex;gap:12px;align-items:center;box-shadow:0 12px 30px #0004}
-.clock{font-size:29px;font-weight:900;font-variant-numeric:tabular-nums}.timerText{flex:1}.timerText b{display:block}.timerText span{font-size:11px;color:#cfcfd4}.timer button{width:auto;padding:10px 12px;border:none}.timer .secondary{background:#2d2d30;color:#fff}
-.notice{background:#fff8df;border:1px solid #ead895;border-radius:15px;padding:11px 12px;font-size:13px;margin-bottom:14px}
-.hidden{display:none}
-@media(max-width:520px){.grid{grid-template-columns:1fr}.exWrap{grid-template-columns:96px 1fr}.thumb{width:96px;height:70px}.setrow{grid-template-columns:36px 1fr 1fr 48px}}
+:root{
+ --bg:#f3f5f8;--card:#ffffff;--text:#13151a;--muted:#737985;--line:#e7e9ee;
+ --soft:#f7f8fa;--accent:#14161b;--shadow:0 10px 30px rgba(20,24,32,.07);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(180deg,#f8f9fb 0,#f3f5f8 240px);color:var(--text)}
+main{max-width:760px;margin:auto;padding:24px 16px 148px}
+h1{font-size:30px;line-height:1.05;letter-spacing:-.8px;margin:4px 0 7px;font-weight:900}
+.lead{margin:0 0 20px;color:var(--muted);font-size:14px;line-height:1.45}
+.panel,.routine,.exercise{background:rgba(255,255,255,.96);border:1px solid rgba(226,229,235,.95);box-shadow:var(--shadow)}
+.panel{padding:10px;border-radius:20px;margin-bottom:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+select,button,input{font:inherit}.control,button{border:1px solid var(--line);border-radius:14px;background:#fff;padding:13px 14px;width:100%;min-height:48px}
+button{font-weight:800;cursor:pointer}.dark{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 8px 22px rgba(20,22,27,.18)}
+.notice{display:none}
+.routines{display:flex;gap:10px;overflow:auto;padding:2px 2px 12px;scrollbar-width:none}.routines::-webkit-scrollbar{display:none}
+.routine{min-width:235px;padding:15px 16px;border-radius:18px;cursor:pointer;box-shadow:none;transition:.18s ease}
+.routine.active{background:#15171c;color:#fff;border-color:#15171c;transform:translateY(-1px)}
+.routine.active .small{color:#c8cbd2}.routine h3{margin:0 0 7px;font-size:16px;letter-spacing:-.2px}.small{font-size:12px;color:var(--muted);line-height:1.45}
+.workoutHead{display:flex;justify-content:space-between;gap:12px;align-items:end;margin:20px 2px 11px}
+.workoutHead h2{margin:0;font-size:24px;line-height:1.05;letter-spacing:-.5px}.pill{background:#eceef2;color:#3b4049;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:900;white-space:nowrap}
+.progress{height:8px;background:#e4e6eb;border-radius:99px;overflow:hidden}.progress div{height:100%;background:#15171c;border-radius:99px;transition:width .25s ease}
+.stats{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 14px;font-size:12px;color:var(--muted);font-weight:700}
+.exercise{padding:14px;border-radius:22px;margin-bottom:12px;overflow:hidden}
+.exWrap{display:grid;grid-template-columns:74px 1fr;gap:13px;align-items:center}
+.thumb{width:74px;height:74px;object-fit:contain;border-radius:18px;background:linear-gradient(145deg,#f5f6f8,#eceef2);border:1px solid #e5e7eb;padding:10px}
+.exTop{display:flex;justify-content:space-between;gap:10px}.exName{font-size:18px;line-height:1.12;font-weight:900;letter-spacing:-.3px}.meta{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.4}
+.circuit{border-color:#d8dbe1}.circuitTag{display:inline-flex;background:#eff1f4;color:#3d424b;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900;margin-bottom:10px;letter-spacing:.5px}
+.sets{display:grid;gap:8px;margin-top:14px}
+.setrow{display:grid;grid-template-columns:38px minmax(0,1fr) minmax(0,1fr) 46px;gap:7px;align-items:center;padding:5px;border-radius:15px;background:#f7f8fa;border:1px solid #eceef2}
+.lbl{font-size:10px;font-weight:900;color:#8b9099;text-align:center;line-height:1.1}.entry{min-width:0;border:0;border-radius:11px;background:#fff;padding:11px 10px;outline:none;box-shadow:inset 0 0 0 1px #e8eaee;font-weight:750;color:#20232a}
+.entry:focus{box-shadow:inset 0 0 0 2px #1b1e24}.entry::placeholder{color:#a5a9b2;font-weight:600}
+.done{appearance:none;width:40px;height:40px;border:2px solid #d4d7dd;border-radius:12px;background:#fff;display:grid;place-items:center;margin:auto;transition:.15s ease}
+.done:checked{background:#15171c;border-color:#15171c}.done:checked:after{content:"✓";color:#fff;font-size:20px;font-weight:950;line-height:1}
+.addSetBtn{margin-top:2px;background:#fff;border:1px solid #dfe2e7;color:#2a2e36;font-weight:900;padding:11px 12px;min-height:44px;border-radius:13px;box-shadow:none}
+.addSetBtn:active{transform:scale(.985);background:#f6f7f9}
+#finish{margin-top:6px;min-height:54px;border-radius:16px;font-size:15px}
+.timer{position:fixed;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(730px,calc(100% - 20px));background:rgba(19,21,26,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);color:#fff;border-radius:21px;padding:10px 10px 10px 14px;display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;box-shadow:0 18px 45px rgba(0,0,0,.28)}
+.clock{font-size:25px;font-weight:950;font-variant-numeric:tabular-nums;letter-spacing:-.5px}.timerText{min-width:0}.timerText b{display:block;font-size:12px}.timerText span{display:block;font-size:10px;color:#b7bbc4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.timer button{width:auto;min-width:58px;min-height:40px;padding:9px 11px;border:none;border-radius:12px}.timer .secondary{background:#2c2f36;color:#fff;min-width:42px}
+
+.demoThumb{width:74px;height:74px;border:0;border-radius:18px;background:linear-gradient(145deg,#171a20,#292e37);padding:0;display:grid;place-items:center;overflow:hidden;min-height:74px;box-shadow:none}
+.demoThumb svg{width:68px;height:68px}.demoThumb:active{transform:scale(.97)}
+.guideBtn{margin-top:10px;width:auto;min-height:36px;padding:8px 11px;border-radius:11px;background:#f2f4f7;border:1px solid #e3e6eb;font-size:12px;font-weight:900;color:#343943;box-shadow:none}
+.guide{display:none;margin-top:12px;border-radius:17px;background:#f6f7f9;border:1px solid #e7e9ee;padding:12px}.guide.open{display:block}
+.guideTitle{font-size:13px;font-weight:950;margin-bottom:9px}.demoScene{display:grid;grid-template-columns:1fr 24px 1fr;align-items:center;gap:5px;margin-bottom:10px}.demoFrame{background:#fff;border:1px solid #e2e5ea;border-radius:14px;padding:6px;text-align:center}.demoFrame b{display:block;font-size:9px;color:#8a909a;letter-spacing:.7px;margin:2px 0 4px}.demoFrame svg{width:100%;height:110px;display:block}.demoArrow{text-align:center;font-size:19px;font-weight:950;color:#646a74}.cueList{display:grid;gap:6px}.cue{font-size:12px;line-height:1.4;color:#444a54;padding-left:18px;position:relative}.cue:before{content:'✓';position:absolute;left:0;font-weight:950;color:#15171c}.warningCue{margin-top:8px;font-size:11px;line-height:1.4;color:#6d5137;background:#fff7ed;border:1px solid #f1dfc9;border-radius:10px;padding:8px 9px}
+
+@media(max-width:520px){
+ main{padding:20px 12px 142px}h1{font-size:27px}.grid{grid-template-columns:1fr 1fr}.panel{padding:8px}.control,button{padding:12px 10px}.routine{min-width:218px}.workoutHead h2{font-size:22px}
+ .exercise{padding:12px}.exWrap{grid-template-columns:62px 1fr;gap:11px}.demoThumb{width:62px;height:62px;min-height:62px;border-radius:16px}.demoThumb svg{width:58px;height:58px}.exName{font-size:16px}.meta{font-size:11px}.demoFrame svg{height:96px}
+ .setrow{grid-template-columns:34px minmax(0,1fr) minmax(0,1fr) 42px;gap:5px}.entry{padding:10px 7px;font-size:14px}.done{width:38px;height:38px}.lbl{font-size:9px}
+ .timer{grid-template-columns:auto 1fr auto auto;gap:7px;padding-left:12px}.clock{font-size:22px}.timerText b{font-size:11px}.timer button{min-width:53px;padding:8px 9px}.timer .secondary{min-width:38px}
+}
+</style>
+
+<style id="final-polish">
+:root{--accent:#7c4dff;--accent2:#9a78ff;--bg:#080b0f;--card:#11161d;--card2:#151b23;--text:#f7f8fb;--muted:#9ca5b3;--line:#252d38}
+html{background:var(--bg)} body{background:radial-gradient(circle at 50% -10%,#17142a 0,#080b0f 34%);color:var(--text);min-height:100vh}
+main{max-width:760px;padding:18px 14px 150px}
+h1{font-size:29px;letter-spacing:-.8px}.lead,.small,.meta{color:var(--muted)!important}
+.panel,.routine,.exercise{background:linear-gradient(180deg,var(--card2),var(--card));border-color:var(--line);box-shadow:0 12px 32px #0004}
+.routine{transition:.18s transform,.18s border-color}.routine:active{transform:scale(.985)}.routine.active{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px #7c4dff33}
+.control,button,.entry{background:#0d1218!important;color:var(--text)!important;border-color:var(--line)!important}
+button.dark,#finish{background:linear-gradient(135deg,var(--accent),#6435e8)!important;border:0!important;box-shadow:0 10px 25px #7c4dff33}
+.pill,.circuitTag{background:var(--accent)!important}.progress{background:#202732!important}.progress div{background:linear-gradient(90deg,var(--accent),var(--accent2))!important}
+.exercise{border-radius:22px!important;padding:14px!important;overflow:hidden}.exName{font-size:18px!important;letter-spacing:-.25px}.thumb{background:#090d12!important;border:1px solid var(--line)!important;border-radius:16px!important;object-fit:contain!important}
+.setrow{padding:2px 0}.lbl{color:#aeb7c5!important}.entry{border-radius:10px!important;text-align:center;font-weight:750}.done{background:#0d1218!important;border-color:#394250!important}.done:checked{background:var(--accent)!important;border-color:var(--accent)!important}
+.addSetBtn{background:#11101a!important;border:1px dashed var(--accent)!important;color:#a98cff!important;border-radius:12px!important}.timer{background:#11161d!important;border:1px solid #2b3340!important;box-shadow:0 16px 40px #0008!important}.clock{color:#fff}.timer .secondary{background:#202632!important}
+.demoBtn,.howBtn{color:#a98cff!important}.demoPanel,.howPanel{background:#0b1016!important;border:1px solid var(--line)!important;border-radius:16px!important}
+@media(max-width:520px){main{padding-left:10px;padding-right:10px}.exercise{padding:12px!important}.setrow{grid-template-columns:38px minmax(0,1fr) minmax(0,.8fr) 46px!important;gap:6px!important}.entry{padding:10px 6px!important}.thumb{border-radius:14px!important}}
 </style>
 </head>
 <body>
 <main>
-<h1>Todd's 12-Week Workout Tracker</h1>
-<p class="lead">Your routines are shown below. Pick a week and a workout, then log every set.</p>
+<h1>Workout Tracker</h1>
+<p class="lead">12-week training log · choose your week, pick a workout, and track every set.</p>
 
 <div class="notice"><b>Tracker ready:</b> Your screenshot exercises are included. The first three Back + Biceps movements are clearly marked as suggested additions.</div>
 
 <div class="panel">
   <div class="grid">
     <select id="week" class="control"></select>
-    <button id="overviewBtn">Show all workouts</button>
+    <button id="overviewBtn">Workouts ↓</button>
   </div>
 </div>
 
@@ -58,7 +101,7 @@ button{font-weight:800}.dark{background:#111;color:#fff;border-color:#111}
   <div class="progress"><div id="bar" style="width:0%"></div></div>
   <div class="stats"><span id="progressText">0 / 0 complete</span><span id="percent">0%</span></div>
   <div id="exercises" style="margin-top:12px"></div>
-  <button class="dark" id="finish">Finish & save workout</button>
+  <button class="dark" id="finish">Finish Workout</button>
 </section>
 </main>
 
@@ -152,6 +195,72 @@ function iconFor(name){
  return "icon-chest.svg";
 }
 
+
+const guides={
+"Machine Chest Flys":["Sit tall with shoulder blades gently back against the pad.","Keep a soft bend in your elbows and bring the handles together in front of your chest.","Return slowly until you feel a chest stretch without letting your shoulders roll forward."],
+"Cable Single Arm Lat Raises":["Stand side-on to the cable with the handle starting near the opposite hip.","Lead with your elbow and raise the arm to about shoulder height.","Lower under control; keep your torso still instead of leaning away."],
+"Incline DB Chest Press":["Set the bench around 30–45° and plant your feet firmly.","Lower dumbbells toward the upper chest with elbows slightly tucked.","Press up and slightly inward without banging the dumbbells together."],
+"DB Shoulder Press":["Sit tall with dumbbells near shoulder level and wrists stacked over elbows.","Press overhead until your arms are nearly straight.","Lower to shoulder level while keeping ribs down and back supported."],
+"Smith Machine Incline Chest Press":["Set the bench so the bar tracks over your upper chest.","Lower the bar under control with forearms close to vertical.","Press up without locking your shoulders forward at the top."],
+"Cable Tricep Pushdowns":["Pin your elbows close to your sides and keep your chest tall.","Extend your elbows until your arms are straight.","Control the return without letting your elbows drift forward."],
+"Cable Single Arm Tricep Extensions":["Keep your upper arm fixed beside your torso.","Straighten the elbow fully while keeping your wrist neutral.","Return slowly until the forearm is just past 90°."],
+"Leg Extensions":["Line your knee up with the machine pivot and place the pad above your ankles.","Extend your knees until your legs are almost straight.","Lower slowly; do not swing the weight stack."],
+"Lying Hamstring Curls":["Position the pad just above your heels and keep hips pressed into the bench.","Curl your heels toward your glutes without lifting your hips.","Lower until your knees are nearly straight, keeping tension on the hamstrings."],
+"Leg Press":["Place feet about shoulder-width and keep your lower back against the pad.","Lower until your knees reach a comfortable deep bend without your pelvis curling up.","Drive through your whole foot and stop just short of locking the knees."],
+"Seated Calf Raises":["Place the balls of your feet on the platform with heels free to move.","Drop your heels for a controlled calf stretch.","Press through the balls of your feet and pause at the top."],
+"DB Walking Lunges (Glute Biased)":["Take a slightly longer step than a normal lunge and lean your torso forward a little.","Lower the back knee while keeping the front foot planted.","Drive through the front heel/midfoot and step directly into the next rep."],
+"Lat Pulldown":["Grip the bar just outside shoulder width and sit tall with thighs secured.","Pull the bar toward the upper chest while driving elbows down.","Let the arms lengthen overhead without shrugging aggressively."],
+"Cable Bar Lateral Pulldown":["Start with arms long overhead and your chest tall.","Pull the bar toward the upper chest by driving the elbows down and back.","Return smoothly to a full stretch without rocking your torso."],
+"Seated Cable Row":["Sit tall with a neutral spine and arms fully extended.","Pull the handle toward your lower ribs while squeezing your shoulder blades.","Reach forward under control without rounding your lower back."],
+"Cable Seated Rows":["Sit tall with a neutral spine and arms fully extended.","Pull the handle toward your lower ribs while squeezing your shoulder blades.","Reach forward under control without rounding your lower back."],
+"Single-Arm Lat Pulldown / Row":["Brace your torso and begin with the working arm fully lengthened.","Drive the elbow down and toward your hip rather than pulling only with the hand.","Pause briefly, then return to a full lat stretch."],
+"Rack Pulls":["Set the bar around knee height and brace before lifting.","Push the floor away and extend hips until you stand tall.","Lower by sending hips back; keep the bar close to your legs."],
+"DB Biceps Curls":["Stand tall with arms long and palms facing forward.","Curl without swinging your shoulders or elbows forward.","Squeeze at the top and lower slowly to full elbow extension."],
+"DB Hammer Curls":["Hold dumbbells with palms facing each other and elbows close to your sides.","Curl while keeping the neutral grip unchanged.","Lower under control without rocking your torso."],
+"Cable Bicep Curls":["Keep your chest tall and elbows fixed near your sides.","Curl the handle toward your shoulders while keeping wrists straight.","Lower fully under control without letting the stack slam."],
+"Overhead Cable Tricep Extensions":["Face away from the cable and keep elbows pointing forward/up.","Extend your elbows until your arms are straight overhead.","Bend only at the elbows on the return; keep your ribs down."],
+"Stairs":["Stand tall and place your whole foot on each step.","Drive through the working leg instead of pulling heavily on the rails.","Keep a steady pace you can maintain for the full interval."],
+"Hanging Leg Raises":["Hang with your shoulders active and legs together.","Curl your pelvis and raise your knees/legs without swinging.","Lower slowly until your body is still before the next rep."],
+"Crunches":["Keep your lower back supported and chin slightly tucked.","Curl your ribs toward your pelvis rather than pulling your neck.","Pause at the top and lower slowly."],
+"Lower Leg Raises":["Lie flat and brace your abs before moving your legs.","Raise your legs while keeping your lower back from arching.","Lower only as far as you can maintain abdominal control."],
+"Plank":["Set elbows under shoulders and make a straight line from head to heels.","Squeeze glutes and brace your abs as if preparing for a punch.","Keep hips from sagging or piking; breathe while holding tension."]
+};
+function movementType(name){const n=name.toLowerCase();if(n.includes('fly'))return'fly';if(n.includes('lateral')||n.includes('lat raises'))return'lateral';if(n.includes('press')&&n.includes('leg'))return'legpress';if(n.includes('press'))return'press';if(n.includes('pushdown'))return'pushdown';if(n.includes('tricep'))return'tricep';if(n.includes('extension')&&n.includes('leg'))return'legext';if(n.includes('hamstring'))return'hamcurl';if(n.includes('calf'))return'calf';if(n.includes('lunge'))return'lunge';if(n.includes('pulldown'))return'pulldown';if(n.includes('row'))return'row';if(n.includes('rack'))return'hinge';if(n.includes('curl'))return'curl';if(n.includes('stair'))return'stairs';if(n.includes('hanging'))return'hanging';if(n.includes('crunch'))return'crunch';if(n.includes('lower leg'))return'legraise';if(n.includes('plank'))return'plank';return'press'}
+function personSvg(type,finish=false,mini=false){
+ const W=mini?70:125,H=mini?70:110,sw=mini?3:4, fg=mini?'#ffffff':'#16191f', acc=mini?'#aeb6c2':'#8e96a3';
+ let body='';
+ const line=(x1,y1,x2,y2,c=fg)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${sw}" stroke-linecap="round"/>`;
+ const head=(x,y)=>`<circle cx="${x}" cy="${y}" r="${mini?5:7}" fill="none" stroke="${fg}" stroke-width="${sw}"/>`;
+ if(['press','fly','lateral','pushdown','tricep','pulldown','row','curl'].includes(type)){
+   body+=head(W*.5,H*.2)+line(W*.5,H*.27,W*.5,H*.62)+line(W*.5,H*.62,W*.35,H*.9)+line(W*.5,H*.62,W*.65,H*.9);
+   if(type==='press'){body+=finish?(line(W*.5,H*.34,W*.35,H*.08)+line(W*.5,H*.34,W*.65,H*.08)):(line(W*.5,H*.36,W*.28,H*.48)+line(W*.5,H*.36,W*.72,H*.48));}
+   if(type==='fly'){body+=finish?(line(W*.5,H*.34,W*.42,H*.48)+line(W*.5,H*.34,W*.58,H*.48)):(line(W*.5,H*.34,W*.17,H*.42)+line(W*.5,H*.34,W*.83,H*.42));}
+   if(type==='lateral'){body+=finish?(line(W*.5,H*.36,W*.14,H*.35)+line(W*.5,H*.36,W*.86,H*.35)):(line(W*.5,H*.36,W*.36,H*.62)+line(W*.5,H*.36,W*.64,H*.62));}
+   if(type==='pushdown'){body+=finish?(line(W*.5,H*.34,W*.40,H*.68)+line(W*.5,H*.34,W*.60,H*.68)):(line(W*.5,H*.34,W*.36,H*.48)+line(W*.36,H*.48,W*.48,H*.58)+line(W*.5,H*.34,W*.64,H*.48)+line(W*.64,H*.48,W*.52,H*.58));}
+   if(type==='tricep'){body+=finish?(line(W*.5,H*.34,W*.36,H*.10)+line(W*.5,H*.34,W*.64,H*.10)):(line(W*.5,H*.34,W*.34,H*.15)+line(W*.34,H*.15,W*.48,H*.08)+line(W*.5,H*.34,W*.66,H*.15)+line(W*.66,H*.15,W*.52,H*.08));}
+   if(type==='pulldown'){body+=finish?(line(W*.5,H*.34,W*.30,H*.42)+line(W*.5,H*.34,W*.70,H*.42)):(line(W*.5,H*.34,W*.28,H*.06)+line(W*.5,H*.34,W*.72,H*.06));body+=line(W*.24,finish?H*.43:H*.05,W*.76,finish?H*.43:H*.05,acc)}
+   if(type==='row'){body+=finish?(line(W*.5,H*.36,W*.32,H*.44)+line(W*.5,H*.36,W*.68,H*.44)):(line(W*.5,H*.36,W*.18,H*.45)+line(W*.5,H*.36,W*.82,H*.45));}
+   if(type==='curl'){body+=finish?(line(W*.5,H*.34,W*.34,H*.42)+line(W*.34,H*.42,W*.42,H*.28)+line(W*.5,H*.34,W*.66,H*.42)+line(W*.66,H*.42,W*.58,H*.28)):(line(W*.5,H*.34,W*.35,H*.66)+line(W*.5,H*.34,W*.65,H*.66));}
+ } else if(type==='hinge'){
+   body+=head(finish?W*.5:W*.65,finish?H*.18:H*.36)+ (finish?line(W*.5,H*.25,W*.5,H*.63):line(W*.62,H*.42,W*.38,H*.61));
+   body+=finish?(line(W*.5,H*.63,W*.35,H*.9)+line(W*.5,H*.63,W*.65,H*.9)):(line(W*.38,H*.61,W*.28,H*.88)+line(W*.38,H*.61,W*.58,H*.88));body+=line(W*.25,H*.68,W*.75,H*.68,acc);
+ } else if(['legext','hamcurl','legpress','calf','lunge','stairs','hanging','crunch','legraise','plank'].includes(type)){
+   if(type==='legext'){body+=head(W*.4,H*.22)+line(W*.4,H*.29,W*.4,H*.58)+line(W*.4,H*.58,W*.62,H*.60)+ (finish?line(W*.62,H*.60,W*.86,H*.60):line(W*.62,H*.60,W*.65,H*.88))+line(W*.25,H*.58,W*.72,H*.58,acc)}
+   if(type==='hamcurl'){body+=head(W*.22,H*.55)+line(W*.28,H*.58,W*.68,H*.58)+line(W*.68,H*.58,W*.82,H*.58)+(finish?line(W*.82,H*.58,W*.70,H*.34):line(W*.82,H*.58,W*.92,H*.58))+line(W*.12,H*.66,W*.90,H*.66,acc)}
+   if(type==='legpress'){body+=head(W*.28,H*.30)+line(W*.34,H*.35,W*.45,H*.62)+line(W*.45,H*.62,W*.62,H*.62)+(finish?line(W*.62,H*.62,W*.84,H*.38):line(W*.62,H*.62,W*.72,H*.42))+line(W*.82,H*.20,W*.82,H*.86,acc)}
+   if(type==='calf'){body+=head(W*.5,H*.18)+line(W*.5,H*.25,W*.5,H*.63)+line(W*.5,H*.63,W*.40,H*.88)+line(W*.5,H*.63,W*.60,H*.88)+line(W*.28,H*(finish?.94:.89),W*.72,H*(finish?.94:.89),acc)}
+   if(type==='lunge'){body+=head(W*.5,H*.17)+line(W*.5,H*.24,W*.46,H*.56)+(finish?(line(W*.46,H*.56,W*.27,H*.78)+line(W*.46,H*.56,W*.69,H*.76)):(line(W*.46,H*.56,W*.38,H*.88)+line(W*.46,H*.56,W*.58,H*.88)))+line(W*.46,H*.35,W*.30,H*.56)+line(W*.46,H*.35,W*.62,H*.56)}
+   if(type==='stairs'){body+=head(W*.48,H*.17)+line(W*.48,H*.24,W*.48,H*.57)+line(W*.48,H*.57,W*.35,H*.83)+line(W*.48,H*.57,W*.65,H*(finish?.70:.86))+line(W*.58,H*.80,W*.90,H*.80,acc)+line(W*.72,H*.62,W*.90,H*.62,acc)}
+   if(type==='hanging'){body+=head(W*.5,H*.22)+line(W*.5,H*.29,W*.5,H*.58)+line(W*.5,H*.29,W*.34,H*.06)+line(W*.5,H*.29,W*.66,H*.06)+line(W*.30,H*.05,W*.70,H*.05,acc)+(finish?(line(W*.5,H*.58,W*.33,H*.58)+line(W*.5,H*.58,W*.67,H*.58)):(line(W*.5,H*.58,W*.42,H*.90)+line(W*.5,H*.58,W*.58,H*.90)))}
+   if(type==='crunch'){body+=line(W*.18,H*.78,W*.86,H*.78,acc)+head(finish?W*.42:W*.26,finish?H*.48:H*.60)+(finish?line(W*.46,H*.53,W*.60,H*.70):line(W*.31,H*.64,W*.58,H*.72))+line(W*.58,H*.72,W*.73,H*.55)+line(W*.58,H*.72,W*.78,H*.72)}
+   if(type==='legraise'){body+=line(W*.12,H*.78,W*.88,H*.78,acc)+head(W*.20,H*.66)+line(W*.26,H*.69,W*.55,H*.72)+(finish?(line(W*.55,H*.72,W*.72,H*.38)+line(W*.55,H*.72,W*.80,H*.42)):(line(W*.55,H*.72,W*.80,H*.72)+line(W*.55,H*.72,W*.84,H*.76)))}
+   if(type==='plank'){body+=head(W*.20,H*.48)+line(W*.27,H*.52,W*.70,H*.62)+line(W*.70,H*.62,W*.88,H*.76)+line(W*.36,H*.55,W*.28,H*.75)+line(W*.28,H*.75,W*.16,H*.75)}
+ }
+ return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-hidden="true">${body}</svg>`
+}
+function thumbSvg(name){return personSvg(movementType(name),true,true)}
+function guideHtml(name){const t=movementType(name), cues=guides[name]||["Use a controlled range of motion.","Keep your torso braced and joints aligned.","Stop if the movement causes sharp pain."];return `<button class="guideBtn" type="button">▶ How to do it</button><div class="guide"><div class="guideTitle">Movement demonstration</div><div class="demoScene"><div class="demoFrame"><b>START</b>${personSvg(t,false)}</div><div class="demoArrow">→</div><div class="demoFrame"><b>FINISH</b>${personSvg(t,true)}</div></div><div class="cueList">${cues.map(c=>`<div class="cue">${c}</div>`).join('')}</div><div class="warningCue">Use the illustration as a positioning guide, not a substitute for in-person coaching. Stop if you feel sharp or unusual pain.</div></div>`}
+
 function renderTracker(){
  const r=routines.find(x=>x.id===active); $("title").textContent=r.name;$("weekPill").textContent="Week "+$("week").value;
  $("exercises").innerHTML="";
@@ -167,7 +276,10 @@ function renderTracker(){
     if(prevReps.length===it.sets && prevReps.every(v=>v>=10)) overload=" • Consider increasing weight";
   }
   let meta=it.sets?`${it.sets} sets • ${it.reps} reps • 90 sec rest${it.rir===0?" • RIR 0":""}${overload}`:`${it.time}${it.circuit?" • 3 rounds":""}`;
-  ex.innerHTML=`${it.circuit?'<div class="circuitTag">ABS CIRCUIT</div>':""}<div class="exWrap"><img class="thumb" src="${iconFor(it.n)}" alt="${it.n} exercise icon"><div><div class="exTop"><div><div class="exName">${it.n}${it.suggested?' <span style="font-size:10px;background:#ececef;padding:4px 7px;border-radius:999px;vertical-align:2px">SUGGESTED</span>':""}</div><div class="meta">${meta}</div>${it.note?`<div class="small" style="margin-top:6px">${it.note}</div>`:""}</div></div></div></div><div class="sets"></div>`;
+  ex.innerHTML=`${it.circuit?'<div class="circuitTag">ABS CIRCUIT</div>':""}<div class="exWrap"><button class="demoThumb" type="button" aria-label="Show ${it.n} demonstration">${thumbSvg(it.n)}</button><div><div class="exTop"><div><div class="exName">${it.n}${it.suggested?' <span style="font-size:10px;background:#ececef;padding:4px 7px;border-radius:999px;vertical-align:2px">SUGGESTED</span>':""}</div><div class="meta">${meta}</div>${it.note?`<div class="small" style="margin-top:6px">${it.note}</div>`:""}</div></div>${guideHtml(it.n)}</div></div><div class="sets"></div>`;
+  const guideBtn=ex.querySelector('.guideBtn'), guide=ex.querySelector('.guide'), demoThumb=ex.querySelector('.demoThumb');
+  const toggleGuide=()=>{guide.classList.toggle('open');guideBtn.textContent=guide.classList.contains('open')?'▼ Hide demonstration':'▶ How to do it'};
+  guideBtn.onclick=toggleGuide; demoThumb.onclick=toggleGuide;
   let box=ex.querySelector(".sets");
   if(it.sets && Number($("week").value)>1){
     let prev=[];
@@ -182,14 +294,32 @@ function renderTracker(){
     }
   }
   if(it.sets){
-   for(let s=1;s<=it.sets;s++){
+   const extraKey=`w${$("week").value}|${r.id}|${ii}|extraSets`;
+   let totalSets=it.sets+Number(get(extraKey,0));
+
+   function addSetRow(s){
     let row=document.createElement("div");row.className="setrow";
     row.innerHTML=`<div class="lbl">SET ${s}</div><input class="entry w" inputmode="decimal" placeholder="Weight" value="${get(dataKey(r.id,ii,s,"w"))}"><input class="entry reps" inputmode="numeric" placeholder="Reps" value="${get(dataKey(r.id,ii,s,"reps"))}"><input class="done" type="checkbox" ${get(dataKey(r.id,ii,s,"done"),false)?"checked":""}>`;
     row.querySelector(".w").onchange=e=>set(dataKey(r.id,ii,s,"w"),e.target.value);
     row.querySelector(".reps").onchange=e=>set(dataKey(r.id,ii,s,"reps"),e.target.value);
     row.querySelector(".done").onchange=e=>{set(dataKey(r.id,ii,s,"done"),e.target.checked);if(e.target.checked)start(true);progress()};
-    box.appendChild(row)
+    box.appendChild(row);
    }
+
+   for(let s=1;s<=totalSets;s++) addSetRow(s);
+
+   let addBtn=document.createElement("button");
+   addBtn.type="button";
+   addBtn.className="addSetBtn";
+   addBtn.textContent="＋ Add another set";
+   addBtn.onclick=()=>{
+     totalSets++;
+     set(extraKey,totalSets-it.sets);
+     addSetRow(totalSets);
+     box.appendChild(addBtn);
+     progress();
+   };
+   box.appendChild(addBtn);
   }else{
    let row=document.createElement("div");row.className="setrow";row.style.gridTemplateColumns="1fr 50px";
    row.innerHTML=`<div class="small">Mark complete when finished</div><input class="done" type="checkbox" ${get(dataKey(r.id,ii,1,"done"),false)?"checked":""}>`;
